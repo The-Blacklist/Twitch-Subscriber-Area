@@ -13,7 +13,12 @@
     } else {
         $title = 'Twitch Subscriber Area';
     }
-
+    
+    if( $installFinished ) {
+        $Twitch = new Decicus\Twitch( TSA_APIKEY, TSA_APISECRET, TSA_REDIRECTURL );
+        $authenticateURL = $Twitch->authenticateURL( array( 'user_read', 'user_subscriptions' ) );
+    }
+    
     if( isset( $_SESSION['access_token'] ) ) {
         $at = $_SESSION['access_token'];
         $username = $_SESSION['username'];
@@ -97,8 +102,6 @@
                 <div class="alert alert-danger">Installation appears to be finished and install directory still exists, please delete this directory (preferred) or rename it.</div>
                 <?php
                     } else {
-                    $Twitch = new Decicus\Twitch( TSA_APIKEY, TSA_APISECRET, TSA_REDIRECTURL );
-                    $authenticateURL = $Twitch->authenticateURL( array( 'user_read', 'user_subscriptions' ) );
                 ?>
                     <div class="page-header"><h1><?php echo $title; ?> - Home</h1></div>
                     <div class="jumbotron">
