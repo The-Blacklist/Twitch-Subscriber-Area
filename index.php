@@ -41,7 +41,7 @@
         $_SESSION['blacklisted'] = 0;
         $blacklistReason = '';
         $isBlacklisted = false;
-        if( mysqli_num_rows( $fetchWLUser ) == 1 ) {
+        if( mysqli_num_rows( $fetchBLUser ) == 1 ) {
             $fetchBLData = mysqli_fetch_array( $fetchBLUser );
             $_SESSION['blacklisted'] = 1;
             $blacklistReason = $fetchBLData['reason'];
@@ -147,33 +147,8 @@
                                         }
                                     }
                                     $firstStreamerKey = array_keys( $getSubStreams );
-                                    $firstStreamer = $getSubStreams[ $firstStreamerKey[ 0 ] ][ 'name' ];
-                                    if( $isSubbed || $isMod || $isWhitelisted && !$isBlacklisted ) {
-                                        if( $isSubbed ) {
-                                            ?>
-                                            <div class="alert alert-success">You are subscribed to <?php echo ( $streamCount == 1 ? $firstStreamer : 'one or more streamers in the list' ); ?> and will now have access to the subscriber posts.</div>
-                                            <?php
-                                        }
-                                        $fetchPosts = mysqli_query( $con, "SELECT id, title, body FROM " . TSA_DB_PREFIX . "posts;" );
-                                        $hasPosts = false;
-                                        while( $row = mysqli_fetch_array( $fetchPosts ) ) {
-                                            $hasPosts = true;
-                                            $postID = $row['id'];
-                                            $postTitle = stripslashes( $row['title'] );
-                                            $postText = stripslashes( nl2br( $row['body'] ) );
-                                            ?>
-                                            <div class="panel panel-primary">
-                                                <div class="panel-heading"><?php echo $postTitle; ?></div>
-                                                <div class="panel-body"><?php echo $postText; ?></div>
-                                            </div>
-                                            <?php
-                                        }
-                                        if( !$hasPosts ) {
-                                            ?>
-                                            <div class="alert alert-warning">There are no posts :(</div>
-                                            <?php
-                                        }
-                                    } elseif( $isBlacklisted ) {
+                                    $firstStreamer = ( !empty( $firstStreamerKey ) ? $getSubStreams[ $firstStreamerKey[ 0 ] ][ 'name' ] : '' );
+                                    if( $isBlacklisted && !$isMod ) {
                                         ?>
                                         <div class="panel panel-danger">
                                             <div class="panel-heading">You have been blacklisted from using this subscriber area &mdash; Reason:</div>
@@ -181,30 +156,62 @@
                                         </div>
                                         <?php
                                     } else {
-                                        if( $atError ) {
-                                            echo $atError;
-                                        } else {
-                                            $noSubMessage = array();
-                                            if( $streamCount == 1 ) {
-                                                $noSubMessage['u'] = $firstStreamer;
-                                                $noSubMessage['msg'] = '.';
-                                            } else {
-                                                $noSubMessage['u'] = 'any of the streamers in the list';
-                                                $noSubMessage['msg'] = ' to at least one of them.';
-                                            }
-                                            ?>
-                                            <div class="alert alert-warning">You are not subscribed to <?php echo $noSubMessage['u']; ?> and will not get access unless you subscribe<?php echo $noSubMessage['msg']; ?></div>
-                                            <div class="list-group">
-                                            <?php
-                                            foreach( $getSubStreams as $UID => $info ) {
-                                                $name = $info[ 'name' ];
+                                        if( $isSubbed || $isMod || $isWhitelisted ) {
+                                            if( $isSubbed ) {
                                                 ?>
-                                                <a href="http://www.twitch.tv/<?php echo $name; ?>" class="list-group-item list-group-item-success">Subscribe to <?php echo $Twitch->getDisplayNameNoAT( $name ); ?></a>
+                                                <div class="alert alert-success">You are subscribed to <?php echo ( $streamCount == 1 ? $firstStreamer : 'one or more streamers in the list' ); ?> and will now have access to the subscriber posts.</div>
                                                 <?php
                                             }
-                                            ?>
-                                            </div>
-                                            <?php
+                                            if( $isWhitelisted ) {
+                                                ?>
+                                                <div class="alert alert-success">You are whitelisted and will have access without a subscription.</div>
+                                                <?php
+                                            }
+                                            $fetchPosts = mysqli_query( $con, "SELECT id, title, body FROM " . TSA_DB_PREFIX . "posts;" );
+                                            $hasPosts = false;
+                                            while( $row = mysqli_fetch_array( $fetchPosts ) ) {
+                                                $hasPosts = true;
+                                                $postID = $row['id'];
+                                                $postTitle = stripslashes( $row['title'] );
+                                                $postText = stripslashes( nl2br( $row['body'] ) );
+                                                ?>
+                                                <div class="panel panel-primary">
+                                                    <div class="panel-heading"><?php echo $postTitle; ?></div>
+                                                    <div class="panel-body"><?php echo $postText; ?></div>
+                                                </div>
+                                                <?php
+                                            }
+                                            if( !$hasPosts ) {
+                                                ?>
+                                                <div class="alert alert-warning">There are no posts :(</div>
+                                                <?php
+                                            }
+                                        } else {
+                                            if( $atError ) {
+                                                echo $atError;
+                                            } else {
+                                                $noSubMessage = array();
+                                                if( $streamCount == 1 ) {
+                                                    $noSubMessage['u'] = $firstStreamer;
+                                                    $noSubMessage['msg'] = '.';
+                                                } else {
+                                                    $noSubMessage['u'] = 'any of the streamers in the list';
+                                                    $noSubMessage['msg'] = ' to at least one of them.';
+                                                }
+                                                ?>
+                                                <div class="alert alert-warning">You are not subscribed to <?php echo $noSubMessage['u']; ?> and will not get access unless you subscribe<?php echo $noSubMessage['msg']; ?></div>
+                                                <div class="list-group">
+                                                <?php
+                                                foreach( $getSubStreams as $UID => $info ) {
+                                                    $name = $info[ 'name' ];
+                                                    ?>
+                                                    <a href="http://www.twitch.tv/<?php echo $name; ?>" class="list-group-item list-group-item-success">Subscribe to <?php echo $Twitch->getDisplayNameNoAT( $name ); ?></a>
+                                                    <?php
+                                                }
+                                                ?>
+                                                </div>
+                                                <?php
+                                            }
                                         }
                                     }
                                 } else {

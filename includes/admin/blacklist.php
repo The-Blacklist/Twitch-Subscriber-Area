@@ -19,7 +19,7 @@
             $checkBL = mysqli_query( $con, "SELECT name, reason FROM " . TSA_DB_PREFIX . "blacklist WHERE uid='$newBLUID' LIMIT 1;" );
             if( mysqli_num_rows( $checkBL ) == 0 ) {
                 $insertBL = mysqli_query( $con, "INSERT INTO " . TSA_DB_PREFIX . "blacklist( name, uid, reason ) VALUES( '$newBLName', '$newBLUID', '$newBLReason' );" );
-                if( !$insertWL ) {
+                if( !$insertBL ) {
                     ?>
                     <div class="alert alert-danger">MySQL error: <?php echo mysqli_error( $con ); ?></div>
                     <?php
@@ -88,20 +88,26 @@
 
 <div class="alert alert-danger">Blacklisted users:</div>
 <?php
-    while( $row = mysqli_fetch_array( $getBlacklist ) ) {
+    if( mysqli_num_rows( $getBlacklist ) == 0 ) {
         ?>
-        <div class="panel panel-danger">
-            <div class="panel-heading">Username: <strong><?php echo $row['name']; ?></strong> &mdash; User ID: <?php echo $row['uid']; ?></div>
-            <div class="panel-body">
-                <?php echo nl2br( $row['reason'] ); ?>
-            </div>
-            <div class="panel-footer">
-                <form method="post" action="admin.php?page=blacklist">
-                    <input type="hidden" name="delBlacklist" value="<?php echo $row['uid']; ?>" />
-                    <button type="submit" class="btn btn-danger">Remove from blacklist</button>
-                </form>
-            </div>
-        </div>
+        <div class="alert alert-warning">There are no blacklisted users.</div>
         <?php
+    } else {
+        while( $row = mysqli_fetch_array( $getBlacklist ) ) {
+            ?>
+            <div class="panel panel-danger">
+                <div class="panel-heading">Username: <strong><?php echo $row['name']; ?></strong> &mdash; User ID: <?php echo $row['uid']; ?></div>
+                <div class="panel-body">
+                    <?php echo nl2br( $row['reason'] ); ?>
+                </div>
+                <div class="panel-footer">
+                    <form method="post" action="admin.php?page=blacklist">
+                        <input type="hidden" name="delBlacklist" value="<?php echo $row['uid']; ?>" />
+                        <button type="submit" class="btn btn-danger">Remove from blacklist</button>
+                    </form>
+                </div>
+            </div>
+            <?php
+        }
     }
 ?>
