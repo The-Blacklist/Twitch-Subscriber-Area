@@ -16,7 +16,7 @@ The point of this project specifically, is to create something similar for other
 - A [Twitch developer application](http://www.twitch.tv/settings/connections) registered with the client ID and client secret (redirect URL will be explained on the installation page).
 
 # Downloads
-The most recommended downloads will be located in [Releases](https://github.com/Decicus/Twitch-Subscriber-Area/releases).
+The most recommended downloads will be located in [Releases](https://github.com/The-Blacklist/Twitch-Subscriber-Area/releases).
 
 # Installation
 - Before installation, it's recommended to have a MySQL database ready with the information, as well as your Twitch developer application info (client ID + client secret).  
@@ -34,10 +34,12 @@ The most recommended downloads will be located in [Releases](https://github.com/
     - Administrators can do what moderators can do, plus changing the title and main description, add/remove streamers to check subscriptions towards, managing moderators and managing other administrators. Please note that **any administrator has the power to remove other administrators**.
     - Neither moderators or administrators are required to be subscribed to access the website.
 - Semi-support for [changing website theme](#themes).
-
-# Planned features
 - A whitelist for users (such as those who live in a country where they are unable to subscribe).
 - A blacklist for users (such as subscribers who have abused their access).
+    - Mods/admins override the blacklist.
+    - Whitelisted users do not override the blacklist and will stay blacklisted until removed from the blacklist.
+
+# Planned features
 - A page dedicated for displaying all the subscriber emotes.
 
 # Credits
@@ -59,7 +61,7 @@ The most recommended downloads will be located in [Releases](https://github.com/
     - nginx 1.4.6, MySQL server 5.5.41, PHP 5.3.29 (Ubuntu 14.04) - Thanks to [obnoxiousfrog](https://github.com/obnoxiousfrog)
 
 # License
-This is licensed under [MIT License](https://github.com/Decicus/Twitch-Subscriber-Area/blob/master/LICENSE).
+This is licensed under [MIT License](https://github.com/The-Blacklist/Twitch-Subscriber-Area/blob/master/LICENSE).
 
 # Contact
 Bugs/issues should go on the "Issues" page most of the time. Other questions or inquiries can be sent via the following methods:
