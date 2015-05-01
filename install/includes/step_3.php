@@ -58,9 +58,14 @@
                             $result = mysqli_query( $con, "CREATE TABLE " . $db_tblprefix . "whitelist( id int NOT NULL AUTO_INCREMENT, PRIMARY KEY(id), name varchar(25), uid int UNIQUE );" )
                             if( $result ) {
                                 echo '<div class="alert alert-success">Created "' . $db_tblprefix . 'whitelist" table.</div>';
-                            ?>
-                                <form method="get" action="install.php"><input type="hidden" name="step" value="4" /><button class="btn btn-success">Continue to step #4</button></form>
-                            <?php
+                                $result = mysqli_query( $con, "CREATE TABLE " . TSA_DB_PREFIX . "blacklist( id int NOT NULL AUTO_INCREMENT, PRIMARY KEY(id), name varchar(25), uid int UNIQUE, reason mediumtext );" );
+                                if( $result ) {
+                                    ?>
+                                    <form method="get" action="install.php"><input type="hidden" name="step" value="4" /><button class="btn btn-success">Continue to step #4    </button></form>
+                                    <?php
+                                } else {
+                                    echo '<div class="alert alert-danger">' . mysqli_error( $con ) . '</div>';
+                                }
                             } else {
                                 echo '<div class="alert alert-danger">' . mysqli_error( $con ) . '</div>';
                             }
