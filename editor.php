@@ -20,6 +20,43 @@
     } else {
         $title = 'Twitch Subscriber Area';
     }
+
+    // For <v1.2 support
+    $checkDownloads = mysqli_query( $con, "SHOW TABLES LIKE '" . TSA_DB_PREFIX . "downloads';" );
+    if( mysqli_num_rows( checkDownloads ) == 0 ) {
+        $createDownload = mysqli_query( $con, "CREATE TABLE " . TSA_DB_PREFIX . "downloads( id int NOT NULL AUTO_INCREMENT, PRIMARY KEY(id), post_id int(11), hash char(40), original_file_name varchar(255), filename varchar(255), size int(11), date date );" );
+        if( !$createDownload ) {
+            ?>
+            <div class="alert alert-danger">Unable to create <?php echo TSA_DB_PREFIX; ?>downloads in the database!</div>
+            <?php
+            exit();
+        }
+    }
+
+    $checkDLWhitelist = mysqli_query( $con, "SELECT meta_value FROM " . TSA_DB_PREFIX . "settings WHERE meta_key='download_whitelist' LIMIT 1;" );
+    if( mysqli_num_rows( $checkDLWhitelist ) == 0 ) {
+        $dlFileTypes = array(
+            'png' => 'image/png',
+            'jpeg' => 'image/jpeg',
+            'jpg' => 'image/jpeg',
+            'bmp' => 'image/bmp',
+            'pdf' => 'application/pdf',
+            'zip' => 'application/octet-stream',
+            'rar' => 'application/octet-stream',
+            'doc' => 'application/msword',
+            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            'txt' => 'text/plain',
+            'log' => 'text/plain',
+            'mp3' => 'audio/mpeg',
+            'wav' => 'audio/wav',
+            'ogg' => 'audio/ogg',
+            'm4v' => 'video/mp4',
+            'mp4' => 'video/mp4',
+            'webm' => 'video/webm';
+        );
+        $createDLWhitelist = mysqli_query( $con, "INSERT INTO " . TSA_DB_PREFIX . "settings( meta_key, meta_value ) VALUES( 'download_whitelist', '" . json_encode( $dlFileTypes ) . "' );");
+    }
 ?>
 <!DOCTYPE html>
 <html>
@@ -161,7 +198,7 @@
                                 <div class="panel-body"><?php echo stripslashes( nl2br( $postBody ) ); ?></div>
                                 <div class="panel-footer">
                                     <a href="<?php echo TSA_REDIRECTURL; ?>/editor.php?edit=<?php echo $postID; ?>" class="btn btn-warning">Edit</a>
-                                    <a href="<?php echo TSA_REDIRECTURL; ?>/editor.php?delete=<?php echo $postID; ?>" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this post?');">Delete</a>
+                                    <a href="<?php echo TSA_REDIRECTURL; ?>/editor.php?delete=<?php echo $postID; ?>" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this post? This will also remove any downloads attached to this post.');">Delete</a>
                                 </div>
                             </div>
                             <?php

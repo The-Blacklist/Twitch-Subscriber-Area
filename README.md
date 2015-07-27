@@ -76,3 +76,6 @@ The easiest way that I have found, is to visit [Bootswatch](https://bootswatch.c
 - Click "Download" at the top, and then "bootstrap.min.css". CTRL + A (or 'Select all') this page and copy this.
 - Next, open css/bootstrap-theme.min.css inside your Twitch Subscriber Area folder with Notepad/TextEdit or whatever text editor you may use. Remove everything in that file and paste what you copied earlier.
 - Save, open/refresh the website and it should use the new theme (You may have to try refresh multiple times for the new theme to be updated, due to your web browser's cache).
+
+# Further development
+In the (hopefully close) future, I have decided to fully rewrite it. More about it in this [gist](https://gist.github.com/Decicus/afe9302d65fae4cc4113).

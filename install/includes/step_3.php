@@ -49,6 +49,7 @@
                     fwrite( $confWrite, $config, strlen( $config ) );
                     fclose( $confWrite );
                     $db_tblprefix = mysqli_real_escape_string( $con, $db_tblprefix );
+                    // I am so sorry for making this the spaghetti it is...
                     $result = mysqli_query( $con, "CREATE TABLE " . $db_tblprefix . "posts( id int NOT NULL AUTO_INCREMENT, PRIMARY KEY(id), title varchar(255), body text);" );
                     if( $result ) {
                         echo '<div class="alert alert-success">Created "' . $db_tblprefix . 'posts" table.</div>';
@@ -60,9 +61,39 @@
                                 echo '<div class="alert alert-success">Created "' . $db_tblprefix . 'whitelist" table.</div>';
                                 $result = mysqli_query( $con, "CREATE TABLE " . $db_tblprefix . "blacklist( id int NOT NULL AUTO_INCREMENT, PRIMARY KEY(id), name varchar(25), uid int UNIQUE, reason mediumtext );" );
                                 if( $result ) {
-                                    ?>
-                                    <form method="get" action="install.php"><input type="hidden" name="step" value="4" /><button class="btn btn-success">Continue to step #4    </button></form>
-                                    <?php
+                                    $result = mysqli_query( $con, "CREATE TABLE " . $db_tblprefix . "downloads( id int NOT NULL AUTO_INCREMENT, PRIMARY KEY(id), post_id int(11), hash char(40), original_file_name varchar(255), filename varchar(255), size int(11), date date );" );
+                                    if( $result ) {
+                                        $dlFileTypes = array(
+                                            'png' => 'image/png',
+                                            'jpeg' => 'image/jpeg',
+                                            'jpg' => 'image/jpeg',
+                                            'bmp' => 'image/bmp',
+                                            'pdf' => 'application/pdf',
+                                            'zip' => 'application/octet-stream',
+                                            'rar' => 'application/octet-stream',
+                                            'doc' => 'application/msword',
+                                            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                            'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                                            'txt' => 'text/plain',
+                                            'log' => 'text/plain',
+                                            'mp3' => 'audio/mpeg',
+                                            'wav' => 'audio/wav',
+                                            'ogg' => 'audio/ogg',
+                                            'm4v' => 'video/mp4',
+                                            'mp4' => 'video/mp4',
+                                            'webm' => 'video/webm';
+                                        );
+                                        $result = mysqli_query( $con, "INSERT INTO " . $db_tblprefix . "settings( meta_key, meta_value ) VALUES( 'download_whitelist', '" . json_encode( $dlFileTypes ) . "' );" );
+                                        if( $result ) {
+                                            ?>
+                                            <form method="get" action="install.php"><input type="hidden" name="step" value="4" /><button class="btn btn-success">Continue to step #4    </button></form>
+                                            <?php
+                                        } else {
+                                            echo '<div class="alert alert-danger">' . mysqli_error( $con ) . '</div>';
+                                        }
+                                    } else {
+                                        echo '<div class="alert alert-danger">' . mysqli_error( $con ) . '</div>';
+                                    }
                                 } else {
                                     echo '<div class="alert alert-danger">' . mysqli_error( $con ) . '</div>';
                                 }
