@@ -7,17 +7,19 @@
         $db_name = $_POST['db_name'];
         $twitch_api_key = $_POST['twitch_apikey'];
         $twitch_secret = $_POST['twitch_secret'];
+        $downloads_location = $_POST['downloads_location'];
         $twitch_redirect = ( !isset( $_POST['twitch_redirect'] ) || $_POST['twitch_redirect'] == '' ? $_SESSION['TSAURL'] : $_POST['twitch_redirect'] );
         $db_tblprefix = ( !isset( $_POST['db_tableprefix'] ) || str_replace( ' ', '', $_POST['db_tableprefix'] ) == '' ? 'tsa_' : str_replace( ' ', '', preg_replace( '([^A-Z,^0-9,^a-z,^_])', '', $_POST['db_tableprefix'] ) ) ); // Should work for making sure that table prefixes are MySQL-valid.
         $missing = false;
         $configFile = implode( DIRECTORY_SEPARATOR, array( '..', 'includes', 'config.php' ) );
 
-        if( $db_user == "" || $db_pass == "" || $db_name == "" || $twitch_api_key == "" || $twitch_secret == "" ) { $missing = true; }
-        if( $db_user == "" ) { echo '<div class="alert alert-danger">Missing MySQL username</div>'; }
-        if( $db_pass == "" ) { echo '<div class="alert alert-danger">Missing MySQL password</div>'; }
-        if( $db_name == "" ) { echo '<div class="alert alert-danger">Missing MySQL database name</div>'; }
-        if( $twitch_api_key == "" ) { echo '<div class="alert alert-danger">Missing Twitch API key</div>'; }
-        if( $twitch_secret == "" ) { echo '<div class="alert alert-danger">Missing Twitch API secret</div>'; }
+        if( empty( $db_user ) || empty( $db_pass ) || empty( $db_name ) || empty( $twitch_api_key ) || empty( $twitch_secret ) || empty(  ) ) { $missing = true; }
+        if( empty( $db_user ) ) { echo '<div class="alert alert-danger">Missing MySQL username</div>'; }
+        if( empty( $db_pass ) ) { echo '<div class="alert alert-danger">Missing MySQL password</div>'; }
+        if( empty( $db_name ) ) { echo '<div class="alert alert-danger">Missing MySQL database name</div>'; }
+        if( empty( $twitch_api_key ) ) { echo '<div class="alert alert-danger">Missing Twitch API key</div>'; }
+        if( empty( $twitch_secret ) ) { echo '<div class="alert alert-danger">Missing Twitch API secret</div>'; }
+        if( empty( $downloads_location ) ) { echo '<div class="alert alert-danger">Missing folder location of subscriber downloads</div>' }
         if( $missing ) { echo '<a href="install.php?step=2" class="btn btn-warning">Back to step #2</a>'; } else {
             $con = mysqli_connect( $db_host, $db_user, $db_pass, $db_name ) or die( 'Error connecting to database.' );
             if( !$con ) {
@@ -48,6 +50,32 @@
                     $confWrite = fopen( $configFile, 'w' ) or die( 'Cannot open configuration file. Please make sure the web server user has the correct permissions to \'includes/config.php\'.' );
                     fwrite( $confWrite, $config, strlen( $config ) );
                     fclose( $confWrite );
+
+                    if( file_exists( $downloads_location ) ) {
+                        if( is_dir( $downloads_location ) ) {
+                            if( !is_writeable( $downloads_location ) ) {
+                                echo '<div class="alert alert-danger">' . $downloads_location . ' is not writable.</div>';
+                                exit();
+                            }
+                        } else {
+                            echo '<div class="alert alert-danger">' . $downloads_location . ' is not a folder.</div>';
+                            exit();
+                        }
+                    } else {
+                        if( !mkdir( $downloads_location, 0777, true ) ) {
+                            echo '<div class="alert alert-danger">Unable to create folder for downloadable files at: ' . $downloads_location . '</div>';
+                            exit();
+                        }
+                    }
+
+                    $writeDlIndex = fopen( $downloads_location . DIRECTORY_SEPARATOR . 'index.php', 'w' ) or die( 'Unable to write file inside ' . $downloads_location . '. Please make sure the web server user has the correct permissions.' );
+                    fwrite( $writeDlIndex, "<?php // Nothing to see here ?>" );
+                    fclose( $writeDlIndex );
+
+                    $writeDlHtaccess = fopen( $downloads_location . DIRECTORY_SEPARATOR . '.htaccess', 'w' ) or die( 'Unable to write file inside ' . $downloads_location . '. Please make sure the web server user has the correct permissions.' );
+                    fwrite( $writeDlHtaccess, "Deny from all" );
+                    fclose( $writeDlHtaccess );
+
                     $db_tblprefix = mysqli_real_escape_string( $con, $db_tblprefix );
                     // I am so sorry for making this the spaghetti it is...
                     $result = mysqli_query( $con, "CREATE TABLE " . $db_tblprefix . "posts( id int NOT NULL AUTO_INCREMENT, PRIMARY KEY(id), title varchar(255), body text);" );
@@ -83,7 +111,10 @@
                                             'mp4' => 'video/mp4',
                                             'webm' => 'video/webm';
                                         );
-                                        $result = mysqli_query( $con, "INSERT INTO " . $db_tblprefix . "settings( meta_key, meta_value ) VALUES( 'download_whitelist', '" . json_encode( $dlFileTypes ) . "' );" );
+                                        $downloads_location = mysqli_real_escape_string( $con, $downloads_location );
+                                        $insertDlFiletypes = "INSERT INTO " . $db_tblprefix . "settings( meta_key, meta_value ) VALUES( 'downloads_whitelist', '" . json_encode( $dlFileTypes ) . "' );";
+                                        $insertDlPlaceholder = "INSERT INTO " . $db_tblprefix . "settings( meta_key, meta_value ) VALUES( 'downloads_location', '" . $downloads_location . "' );";
+                                        $result = mysqli_multi_query( $con, $insertDlFiletypes . $insertDlPlaceholder );
                                         if( $result ) {
                                             ?>
                                             <form method="get" action="install.php"><input type="hidden" name="step" value="4" /><button class="btn btn-success">Continue to step #4    </button></form>

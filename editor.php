@@ -33,7 +33,7 @@
         }
     }
 
-    $checkDLWhitelist = mysqli_query( $con, "SELECT meta_value FROM " . TSA_DB_PREFIX . "settings WHERE meta_key='download_whitelist' LIMIT 1;" );
+    $checkDLWhitelist = mysqli_query( $con, "SELECT meta_value FROM " . TSA_DB_PREFIX . "settings WHERE meta_key='downloads_whitelist' LIMIT 1;" );
     if( mysqli_num_rows( $checkDLWhitelist ) == 0 ) {
         $dlFileTypes = array(
             'png' => 'image/png',
@@ -55,7 +55,7 @@
             'mp4' => 'video/mp4',
             'webm' => 'video/webm';
         );
-        $createDLWhitelist = mysqli_query( $con, "INSERT INTO " . TSA_DB_PREFIX . "settings( meta_key, meta_value ) VALUES( 'download_whitelist', '" . json_encode( $dlFileTypes ) . "' );");
+        $createDLWhitelist = mysqli_query( $con, "INSERT INTO " . TSA_DB_PREFIX . "settings( meta_key, meta_value ) VALUES( 'downloads_whitelist', '" . json_encode( $dlFileTypes ) . "' );");
     }
 ?>
 <!DOCTYPE html>
@@ -72,118 +72,13 @@
                 <p class="text text-info">This is the editor panel of <?php echo $title; ?>. The posts shown on the homepage can be edited here by moderators or admins.</p>
                 <?php
                     if( isset( $_GET['add'] ) ) {
-                        if( isset( $_POST['addPostBody'] ) && isset( $_POST['addPostTitle'] ) ) {
-                            $addPostTitle = mysqli_real_escape_string( $con, $_POST['addPostTitle'] );
-                            $addPostBody = mysqli_real_escape_string( $con, $_POST['addPostBody'] );
-                            if( $addPostTitle != "" && $addPostBody != "" ) {
-                                $insertPost = mysqli_query( $con, "INSERT INTO " . TSA_DB_PREFIX . "posts( title, body ) VALUES( '" . $addPostTitle . "', '" . $addPostBody . "' );" );
-                                if( $insertPost ) {
-                                    ?>
-                                    <div class="alert alert-success">Post "<?php echo stripslashes( $addPostTitle ); ?>" has been added!</div>
-                                    <?php
-                                } else {
-                                    ?>
-                                    <div class="alert alert-danger">Error! - <?php echo mysqli_error( $con ); ?></div>
-                                    <?php
-                                }
-                            } else {
-                                ?>
-                                <div class="alert alert-warning">Both title and main text needs to be filled out.</div>
-                                <a href="<?php echo TSA_REDIRECTURL; ?>/editor.php?add" class="btn btn-info">Back to "add post"</a><br /><br />
-                                <?php
-                            }
-                        } else {
-                            ?>
-                            <div class="panel panel-success">
-                                <div class="panel-heading">Add post:</div>
-                                <div class="panel-body">
-                                    <form method="post" action="<?php echo TSA_REDIRECTURL; ?>/editor.php?add">
-                                        <div class="form-group">
-                                            <label for="postTitle">Post title:</label>
-                                            <input type="text" class="form-control" name="addPostTitle" id="postTitle" placeholder="Title" required="" />
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="postBody">Post body (main text):</label>
-                                            <textarea class="form-control" name="addPostBody" id="postBody" rows="10" cols="50" placeholder="Main text" required=""></textarea>
-                                        </div>
-                                        <button type="submit" class="btn btn-success">Add post!</button>
-                                    </form>
-                                </div>
-                            </div>
-                            <?php
-                        }
-                        ?>
-                        <a href="<?php echo TSA_REDIRECTURL; ?>/editor.php" class="btn btn-info">Back to editor page</a><br />
-                        <?php
+                        require 'includes/editor/add.php';
                     } elseif( isset( $_GET['edit'] ) ) {
-                        $editID = intval( preg_replace( '([\D])', '', $_GET['edit'] ) );
-                        $editPost = mysqli_query( $con, "SELECT title, body FROM " . TSA_DB_PREFIX . "posts WHERE id='" . $editID . "' LIMIT 1;" );
-                        if( mysqli_num_rows( $editPost ) == 0 ) {
-                            ?>
-                            <div class="alert alert-danger">Post does not exist.</div>
-                            <?php
-                        } else {
-                            $postInfo = mysqli_fetch_array( $editPost );
-                            if( isset( $_POST['editPostTitle'] ) && isset( $_POST['editPostBody'] ) ) {
-                                $editPostTitle = mysqli_real_escape_string( $con, $_POST['editPostTitle'] );
-                                $editPostBody = mysqli_real_escape_string( $con, $_POST['editPostBody'] );
-                                if( mysqli_query( $con, "UPDATE " . TSA_DB_PREFIX . "posts SET title='" . $editPostTitle . "', body='" . $editPostBody . "' WHERE id='" . $editID ."';" ) ) {
-                                    ?>
-                                    <div class="alert alert-success">Post "<?php echo stripslashes( $editPostTitle ); ?>" has been edited.</div>
-                                    <?php
-                                } else {
-                                    ?>
-                                    <div class="alert alert-danger">Error! - <?php echo mysqli_error( $con ); ?></div>
-                                    <?php
-                                }
-                            } else {
-                                ?>
-                                <div class="panel panel-warning">
-                                    <div class="panel-heading">Currently editing: "<strong><?php echo $postInfo['title']; ?></strong>"</div>
-                                    <div class="panel-body">
-                                        <form method="post" action="<?php echo TSA_REDIRECTURL; ?>/editor.php?edit=<?php echo $editID; ?>">
-                                            <div class="form-group">
-                                                <label for="postTitle">Post title:</label>
-                                                <input type="text" class="form-control" name="editPostTitle" id="postTitle" value="<?php echo $postInfo['title']; ?>" required="" />
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="postBody">Post body (main text):</label>
-                                                <textarea class="form-control" name="editPostBody" id="postBody" rows="10" cols="50" required=""><?php echo $postInfo['body']; ?></textarea>
-                                            </div>
-                                            <button type="submit" class="btn btn-success">Edit post!</button>
-                                        </form>
-                                    </div>
-                                </div>
-                                <?php
-                            }
-                        }
-                        ?>
-                        <br />
-                        <a href="<?php echo TSA_REDIRECTURL; ?>/editor.php" class="btn btn-info">Back to editor page</a><br />
-                        <?php
+                        require 'includes/editor/edit.php';
                     } elseif( isset( $_GET['delete'] ) ) {
-                        $delID = intval( preg_replace( '([\D])', '', $_GET['delete'] ) );
-                        $delPost = mysqli_query( $con, "SELECT title, body FROM " . TSA_DB_PREFIX . "posts WHERE id='" . $delID . "' LIMIT 1;" );
-                        if( mysqli_num_rows( $delPost ) == 0 ) {
-                            ?>
-                            <div class="alert alert-danger">Post does not exist.</div>
-                            <?php
-                        } else {
-                            $postInfo = mysqli_fetch_array( $delPost );
-                            $postTitle = $postInfo['title'];
-                            if( mysqli_query( $con, "DELETE FROM " . TSA_DB_PREFIX . "posts WHERE id='" . $delID . "';" ) ) {
-                                ?>
-                                <div class="alert alert-success">"<strong><?php echo $postTitle; ?></strong>" has been deleted.</div>
-                                <?php
-                            } else {
-                                ?>
-                                <div class="alert alert-danger">Error! - <?php echo mysqli_error( $con ); ?></div>
-                                <?php
-                            }
-                        }
-                        ?>
-                        <a href="<?php echo TSA_REDIRECTURL; ?>/editor.php" class="btn btn-info">Back to editor page</a><br />
-                        <?php
+                        require 'includes/editor/delete.php';
+                    } elseif( isset( $_GET['downloads'] ) {
+                        require 'includes/editor/downloads.php';
                     } else {
                         $allPosts = mysqli_query( $con, "SELECT id, title, body FROM " . TSA_DB_PREFIX . "posts;" );
                         $hasPosts = false;
