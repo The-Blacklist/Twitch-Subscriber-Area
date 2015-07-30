@@ -113,6 +113,27 @@
                                 <?php
                             }
 
+                            $errorTypes = array(
+                                "no_login" => "You are not logged in.",
+                                "not_found" => "This file was not found.",
+                                "no_sub" => "You are not a subscriber and will not get access.",
+                                "no_streams" => "There are no subscriber streams to verify subscriber status for.",
+                                "invalid_id" => "Invalid download ID."
+                            );
+
+                            if( !empty( $_GET['dl_error'] ) ) {
+                                $dl_error = $_GET['dl_error'];
+                                if( isset( $errorTypes[ $dl_error ] ) ) {
+                                    ?>
+                                    <div class="alert alert-warning"><?php echo $errorTypes[ $dl_error ]; ?></div>
+                                    <?php
+                                } else {
+                                    ?>
+                                    <div class="alert alert-warning">An unknown download error occurred.</div>
+                                    <?php
+                                }
+                            }
+
                             if( isset( $_SESSION['access_token'] ) ) {
                                 ?>
                                 <div class="alert alert-success">Welcome <span class="bold"><?php echo $displayName; ?></span>. You are successfully logged in and fully authenticated.</div>
@@ -174,10 +195,41 @@
                                                 $postID = $row['id'];
                                                 $postTitle = stripslashes( $row['title'] );
                                                 $postText = stripslashes( nl2br( $row['body'] ) );
+                                                $fetchPostDLs = mysqli_query( $con, "SELECT id, original_file_name, size FROM " . TSA_DB_PREFIX . "downloads WHERE post_id='" . $postID . "';" );
                                                 ?>
                                                 <div class="panel panel-primary">
                                                     <div class="panel-heading"><?php echo $postTitle; ?></div>
                                                     <div class="panel-body"><?php echo $postText; ?></div>
+                                                    <?php
+                                                        if( mysqli_num_rows( $fetchPostDLs ) > 0 ) {
+                                                            ?>
+                                                            <div class="panel panel-footer">Attached downloads:</div>
+                                                            <table class="table">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Filename:</th>
+                                                                        <th>Filesize:</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <?php
+                                                                        while( $row = mysqli_fetch_array( $fetchPostDLs ) ) {
+                                                                            $id = $row['id'];
+                                                                            $fileName = $row['original_file_name'];
+                                                                            $filesize = $row['size'];
+                                                                            ?>
+                                                                            <tr>
+                                                                                <td><a href="<?php echo TSA_REDIRECTURL . '/' . 'downloader.php?id=' . $id; ?>"><?php echo $fileName; ?></a></td>
+                                                                                <td><?php echo HFFilesize( $filesize, 1 ); ?></td>
+                                                                            </tr>
+                                                                            <?php
+                                                                        }
+                                                                    ?>
+                                                                </tbody>
+                                                            </table>
+                                                            <?php
+                                                        }
+                                                    ?>
                                                 </div>
                                                 <?php
                                             }

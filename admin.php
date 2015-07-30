@@ -39,7 +39,8 @@
                         'description' => 'Modify the homepage description.',
                         'streamers' => 'Modify the list of partnered streamers supported on this site.',
                         'whitelist' => 'Users that have access to the subscriber area without being a subscriber or mod/admin.',
-                        'blacklist' => 'Users that are blocked from having access to the subscriber area.'
+                        'blacklist' => 'Users that are blocked from having access to the subscriber area.',
+                        'downloads' => 'Manage settings for downloads, such as whitelisted filetypes moderators can upload.'
                     );
                     $currentPage = "";
                     if( isset( $_GET['page'] ) && isset( $pages[ $_GET['page'] ] ) ) {

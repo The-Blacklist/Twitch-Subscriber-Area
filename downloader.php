@@ -2,7 +2,6 @@
     error_reporting( 0 );
     require 'includes/main.php';
     require 'includes/check_install.php';
-    $page = 'index';
 
     if( $installFinished && !$installExists ) {
         require 'includes' . DIRECTORY_SEPARATOR . 'install_finish_db.php';
@@ -10,8 +9,6 @@
             session_destroy();
             header( 'Location: ' . TSA_REDIRECTURL );
         }
-    } else {
-        $title = 'Twitch Subscriber Area';
     }
 
     if( isset( $_SESSION['access_token'] ) ) {
@@ -71,7 +68,7 @@
     $fetchDownloadsDir = mysqli_fetch_array( mysqli_query( $con, "SELECT meta_value FROM " . TSA_DB_PREFIX . "settings WHERE meta_key='downloads_location' LIMIT 1;" ) );
     $downloadsDir = $fetchDownloadsDir['meta_value'];
     $fetchFiletypes = mysqli_fetch_array( mysqli_query( $con, "SELECT meta_value FROM " . TSA_DB_PREFIX . "settings WHERE meta_key='downloads_whitelist' LIMIT 1;" ) );
-    $filetypes = $fetchFiletypes['meta_value'];
+    $filetypes = json_decode( $fetchFiletypes['meta_value'], true );
     if( !empty( $_GET['id'] ) ) {
         $id = intval( $_GET['id'] );
         if( $id ) {
@@ -103,7 +100,7 @@
                             header( 'Pragma: public' );
                             header( 'Content-Length: ' . $dlInfo['size'] );
                             readfile( $fileLocation );
-                            exit;
+                            exit();
                         } else {
                             header( 'Location: ' . TSA_REDIRECTURL . '?dl_error=not_found' );
                         }

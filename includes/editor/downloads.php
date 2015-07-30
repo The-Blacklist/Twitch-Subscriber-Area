@@ -6,7 +6,7 @@
     $fetchDownloads = mysqli_query( $con, "SELECT id, post_id, hash, filetype, original_file_name, size FROM " . TSA_DB_PREFIX . "downloads;" );
     if( !empty( $_POST['post_id'] ) && !empty( $_FILES['file_upload'] )  ) {
         $filetypesArray = mysqli_fetch_array( $fetchFiletypes );
-        $wlFiletypes = $filestypesArray['meta_value'];
+        $wlFiletypes = json_decode( $filestypesArray['meta_value'], true );
         $fileInfo = $_FILES['file_upload'];
         $originalFileName = $fileInfo['name'];
         $filesize = $fileInfo['size'];
