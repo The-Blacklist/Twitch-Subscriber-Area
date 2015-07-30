@@ -90,7 +90,7 @@
 
                     if( $isSubbed || $isWhitelisted || $isMod ) {
                         $dlInfo = mysqli_fetch_array( $fetchDownload );
-                        $fileLocation = realpath( $downloadsDir . DIRECTORY_SEPARATOR . $dlInfo['hash'] . $dlInfo['filetype'] );
+                        $fileLocation = basename( $downloadsDir . DIRECTORY_SEPARATOR . $dlInfo['hash'] . $dlInfo['filetype'] );
                         if( file_exists( $fileLocation ) && isset( $filetypes[ $dlInfo[ 'filetype' ] ] ) ) {
                             header( 'Content-Description: File Transfer');
                             header( 'Content-Type: ' . $filetypes[ $dlInfo[ 'filetype' ] ] );

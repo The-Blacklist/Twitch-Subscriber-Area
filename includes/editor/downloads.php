@@ -54,7 +54,7 @@
                 <?php
             } else {
                 $dlInfo = mysqli_fetch_array( $checkDL );
-                if( unlink( realpath( $uploadDirectory . $checkDL['hash'] . $checkDL['filetype'] ) ) && mysqli_query( $con, "DELETE FROM " . TSA_DB_PREFIX . "downloads WHERE id='" . $deleteID . "' LIMIT 1;" ) ) {
+                if( unlink( basename( $uploadDirectory . $checkDL['hash'] . $checkDL['filetype'] ) ) && mysqli_query( $con, "DELETE FROM " . TSA_DB_PREFIX . "downloads WHERE id='" . $deleteID . "' LIMIT 1;" ) ) {
                     ?>
                     <div class="alert alert-success"><?php echo $checkDL['original_file_name']; ?> was successfully deleted.</div>
                     <?php
