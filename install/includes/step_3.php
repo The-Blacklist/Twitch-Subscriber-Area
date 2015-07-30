@@ -7,7 +7,7 @@
         $db_name = $_POST['db_name'];
         $twitch_api_key = $_POST['twitch_apikey'];
         $twitch_secret = $_POST['twitch_secret'];
-        $downloads_location = ( strpos( $_POST['downloads_location'], '/' ) === 0 ? basename( '/' . $_POST['downloads_location'] ) : basename( $_POST['downloads_location'] ) );
+        $downloads_location = ( strpos( $_POST['downloads_location'], '/' ) === 0 ? basename( $_POST['downloads_location'] ) : basename( '../' . $_POST['downloads_location'] ) );
         $twitch_redirect = ( !isset( $_POST['twitch_redirect'] ) || $_POST['twitch_redirect'] == '' ? $_SESSION['TSAURL'] : $_POST['twitch_redirect'] );
         $db_tblprefix = ( !isset( $_POST['db_tableprefix'] ) || str_replace( ' ', '', $_POST['db_tableprefix'] ) == '' ? 'tsa_' : str_replace( ' ', '', preg_replace( '([^A-Z,^0-9,^a-z,^_])', '', $_POST['db_tableprefix'] ) ) ); // Should work for making sure that table prefixes are MySQL-valid.
         $missing = false;
