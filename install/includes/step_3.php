@@ -68,11 +68,11 @@
                         }
                     }
 
-                    $writeDlIndex = fopen( $downloads_location . DIRECTORY_SEPARATOR . 'index.php', 'w' ) or die( 'Unable to write file inside ' . $downloads_location . '. Please make sure the web server user has the correct permissions.' );
+                    $writeDlIndex = fopen( realpath( $downloads_location . DIRECTORY_SEPARATOR . '.htaccess' ), 'w' ) or die( 'Unable to write file inside ' . $downloads_location . '. Please make sure the web server user has the correct permissions.' );
                     fwrite( $writeDlIndex, "<?php // Nothing to see here ?>" );
                     fclose( $writeDlIndex );
 
-                    $writeDlHtaccess = fopen( $downloads_location . DIRECTORY_SEPARATOR . '.htaccess', 'w' ) or die( 'Unable to write file inside ' . $downloads_location . '. Please make sure the web server user has the correct permissions.' );
+                    $writeDlHtaccess = fopen( realpath( $downloads_location . DIRECTORY_SEPARATOR . '.htaccess' ), 'w' ) or die( 'Unable to write file inside ' . $downloads_location . '. Please make sure the web server user has the correct permissions.' );
                     fwrite( $writeDlHtaccess, "Deny from all" );
                     fclose( $writeDlHtaccess );
 
@@ -89,7 +89,7 @@
                                 echo '<div class="alert alert-success">Created "' . $db_tblprefix . 'whitelist" table.</div>';
                                 $result = mysqli_query( $con, "CREATE TABLE " . $db_tblprefix . "blacklist( id int NOT NULL AUTO_INCREMENT, PRIMARY KEY(id), name varchar(25), uid int UNIQUE, reason mediumtext );" );
                                 if( $result ) {
-                                    $result = mysqli_query( $con, "CREATE TABLE " . $db_tblprefix . "downloads( id int NOT NULL AUTO_INCREMENT, PRIMARY KEY(id), post_id int(11), hash char(40), original_file_name varchar(255), filename varchar(255), size int(11), date date );" );
+                                    $result = mysqli_query( $con, "CREATE TABLE " . $db_tblprefix . "downloads( id int NOT NULL AUTO_INCREMENT, PRIMARY KEY(id), post_id int(11), hash char(40), original_file_name varchar(255), size int(11), date date );" );
                                     if( $result ) {
                                         $dlFileTypes = array(
                                             'png' => 'image/png',
@@ -111,7 +111,7 @@
                                             'mp4' => 'video/mp4',
                                             'webm' => 'video/webm';
                                         );
-                                        $downloads_location = mysqli_real_escape_string( $con, $downloads_location );
+                                        $downloads_location = mysqli_real_escape_string( $con, realpath( $downloads_location . DIRECTORY_SEPARATOR ) );
                                         $insertDlFiletypes = "INSERT INTO " . $db_tblprefix . "settings( meta_key, meta_value ) VALUES( 'downloads_whitelist', '" . json_encode( $dlFileTypes ) . "' );";
                                         $insertDlPlaceholder = "INSERT INTO " . $db_tblprefix . "settings( meta_key, meta_value ) VALUES( 'downloads_location', '" . $downloads_location . "' );";
                                         $result = mysqli_multi_query( $con, $insertDlFiletypes . $insertDlPlaceholder );
