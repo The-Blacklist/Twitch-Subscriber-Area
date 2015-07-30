@@ -1,10 +1,12 @@
 <?php
     $fetchFiletypes = mysqli_query( $con, "SELECT meta_value FROM " . TSA_DB_PREFIX . "settings WHERE meta_key='downloads_whitelist' LIMIT 1;" );
     $fetchPosts = mysqli_query( $con, "SELECT id, title FROM " . TSA_DB_PREFIX . "posts;" );
-    $uploadDirectory = mysqli_fetch_array( mysqli_query( $con, "SELECT meta_value FROM " . TSA_DB_PREFIX . "settings WHERE meta_key='downloads_location' LIMIT 1;" ) )['meta_value'];
-    $fetchDownloads = mysqli_query( $con, "SELECT id, post_id, hash, original_file_name, size FROM " . TSA_DB_PREFIX . "downloads;" );
+    $fetchUploadDirectory = mysqli_fetch_array( mysqli_query( $con, "SELECT meta_value FROM " . TSA_DB_PREFIX . "settings WHERE meta_key='downloads_location' LIMIT 1;" ) );
+    $uploadDirectory = $fetchUploadDirectory['meta_value'];
+    $fetchDownloads = mysqli_query( $con, "SELECT id, post_id, hash, filetype, original_file_name, size FROM " . TSA_DB_PREFIX . "downloads;" );
     if( !empty( $_POST['post_id'] ) && !empty( $_FILES['file_upload'] )  ) {
-        $wlFiletypes = mysqli_fetch_array( $fetchFiletypes )['meta_value'];
+        $filetypesArray = mysqli_fetch_array( $fetchFiletypes );
+        $wlFiletypes = $filestypesArray['meta_value'];
         $fileInfo = $_FILES['file_upload'];
         $originalFileName = $fileInfo['name'];
         $filesize = $fileInfo['size'];
@@ -21,7 +23,7 @@
             <?php
         } else {
             $origName = mysqli_real_escape_string( $con, $originalFileName );
-            $insertDl = mysqli_query( $con, "INSERT INTO " . TSA_DB_PREFIX . "downloads( post_id, hash, original_file_name, size, date ) VALUES( '" . $post_id . "', '" . $fileHash . "', '" . $origName . "', '" . $filesize . "', '" . date( "Y-m-d H:i:s" ) . "' );" );
+            $insertDl = mysqli_query( $con, "INSERT INTO " . TSA_DB_PREFIX . "downloads( post_id, hash, filetype, original_file_name, size, date ) VALUES( '" . $post_id . "', '" . $fileHash . "', '" . $fileType . "', '" . $origName . "', '" . $filesize . "', '" . date( "Y-m-d H:i:s" ) . "' );" );
             if( move_uploaded_file( $fileInfo['tmp_name'], $uploadDirectory . $fileHash . $fileType ) && $insertDl ) {
                 ?>
                 <div class="alert alert-success">Download has been successfully added.</div>
@@ -45,14 +47,14 @@
         $deleteID = intval( $_POST['delete_dl_id'] );
 
         if( $deleteID ) {
-            $checkDL = mysqli_query( $con, "SELECT post_id, hash, original_file_name FROM " . TSA_DB_PREFIX . "downloads WHERE id='" . $deleteID . "' LIMIT 1;" );
+            $checkDL = mysqli_query( $con, "SELECT post_id, hash, filetype, original_file_name FROM " . TSA_DB_PREFIX . "downloads WHERE id='" . $deleteID . "' LIMIT 1;" );
             if( mysqli_num_rows( $checkDL ) == 0 ) {
                 ?>
                 <div class="alert alert-danger">This file does not exist.</div>
                 <?php
             } else {
                 $dlInfo = mysqli_fetch_array( $checkDL );
-                if( unlink( realpath( $uploadDirectory . $checkDL['hash'] . pathinfo( $checkDL['original_file_name'] )['extension'] ) ) && mysqli_query( $con, "DELETE FROM " . TSA_DB_PREFIX . "downloads WHERE id='" . $deleteID . "' LIMIT 1;" ) ) {
+                if( unlink( realpath( $uploadDirectory . $checkDL['hash'] . $checkDL['filetype'] ) ) && mysqli_query( $con, "DELETE FROM " . TSA_DB_PREFIX . "downloads WHERE id='" . $deleteID . "' LIMIT 1;" ) ) {
                     ?>
                     <div class="alert alert-success"><?php echo $checkDL['original_file_name']; ?> was successfully deleted.</div>
                     <?php
@@ -113,10 +115,12 @@
                     $id = $row['id'];
                     $post_id = $row['id'];
                     $hash = $row['hash'];
+                    $fileType = $row['filetype'];
                     $fileName = $row['original_file_name'];
                     $size = $row['size'];
                     if( !isset( $postTiles[ $post_id ] ) ) {
-                        $postTitles[ $post_id ] = mysqli_fetch_array( mysqli_query( $con, "SELECT title FROM " . TSA_DB_PREFIX . "posts WHERE id='" . $post_id . "' LIMIT 1;" ) )['title'];
+                        $fetchingTitle = mysqli_fetch_array( mysqli_query( $con, "SELECT title FROM " . TSA_DB_PREFIX . "posts WHERE id='" . $post_id . "' LIMIT 1;" ) );
+                        $postTitles[ $post_id ] = $fetchingTitle['title'];
                     }
                     ?>
                     <option value="<?php echo $id; ?>"><?php echo $fileName; ?> (<?php echo $postTitles[ $post_id ]; ?>)</option>

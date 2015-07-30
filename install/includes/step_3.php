@@ -7,7 +7,7 @@
         $db_name = $_POST['db_name'];
         $twitch_api_key = $_POST['twitch_apikey'];
         $twitch_secret = $_POST['twitch_secret'];
-        $downloads_location = $_POST['downloads_location'];
+        $downloads_location = realpath( $_POST['downloads_location'] );
         $twitch_redirect = ( !isset( $_POST['twitch_redirect'] ) || $_POST['twitch_redirect'] == '' ? $_SESSION['TSAURL'] : $_POST['twitch_redirect'] );
         $db_tblprefix = ( !isset( $_POST['db_tableprefix'] ) || str_replace( ' ', '', $_POST['db_tableprefix'] ) == '' ? 'tsa_' : str_replace( ' ', '', preg_replace( '([^A-Z,^0-9,^a-z,^_])', '', $_POST['db_tableprefix'] ) ) ); // Should work for making sure that table prefixes are MySQL-valid.
         $missing = false;
@@ -89,7 +89,7 @@
                                 echo '<div class="alert alert-success">Created "' . $db_tblprefix . 'whitelist" table.</div>';
                                 $result = mysqli_query( $con, "CREATE TABLE " . $db_tblprefix . "blacklist( id int NOT NULL AUTO_INCREMENT, PRIMARY KEY(id), name varchar(25), uid int UNIQUE, reason mediumtext );" );
                                 if( $result ) {
-                                    $result = mysqli_query( $con, "CREATE TABLE " . $db_tblprefix . "downloads( id int NOT NULL AUTO_INCREMENT, PRIMARY KEY(id), post_id int(11), hash char(40), original_file_name varchar(255), size int(11), date date );" );
+                                    $result = mysqli_query( $con, "CREATE TABLE " . $db_tblprefix . "downloads( id int NOT NULL AUTO_INCREMENT, PRIMARY KEY(id), post_id int(11), hash char(40), filetype varchar(255), original_file_name varchar(255), size int(11), date date );" );
                                     if( $result ) {
                                         $dlFileTypes = array(
                                             'png' => 'image/png',
