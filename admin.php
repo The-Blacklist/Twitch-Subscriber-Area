@@ -17,6 +17,31 @@
     } else {
         $title = 'Twitch Subscriber Area';
     }
+
+    $checkDLWhitelist = mysqli_query( $con, "SELECT meta_value FROM " . TSA_DB_PREFIX . "settings WHERE meta_key='downloads_whitelist' LIMIT 1;" );
+    if( mysqli_num_rows( $checkDLWhitelist ) == 0 ) {
+        $dlFileTypes = array(
+            'png' => 'image/png',
+            'jpeg' => 'image/jpeg',
+            'jpg' => 'image/jpeg',
+            'bmp' => 'image/bmp',
+            'pdf' => 'application/pdf',
+            'zip' => 'application/octet-stream',
+            'rar' => 'application/octet-stream',
+            'doc' => 'application/msword',
+            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            'txt' => 'text/plain',
+            'log' => 'text/plain',
+            'mp3' => 'audio/mpeg',
+            'wav' => 'audio/wav',
+            'ogg' => 'audio/ogg',
+            'm4v' => 'video/mp4',
+            'mp4' => 'video/mp4',
+            'webm' => 'video/webm'
+        );
+        $createDLWhitelist = mysqli_query( $con, "INSERT INTO " . TSA_DB_PREFIX . "settings( meta_key, meta_value ) VALUES( 'downloads_whitelist', '" . json_encode( $dlFileTypes ) . "' );");
+    }
 ?>
 <!DOCTYPE html>
 <html>

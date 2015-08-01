@@ -1,6 +1,19 @@
 <?php
     $fetchFiletypes = mysqli_fetch_array( mysqli_query( $con, "SELECT meta_value FROM " . TSA_DB_PREFIX . "settings WHERE meta_key='downloads_whitelist' LIMIT 1;" ) );
     $filetypes = json_decode( $fetchFiletypes['meta_value'], true );
+    $fetchDownloadDir = mysqli_query( $con, "SELECT meta_value FROM " . TSA_DB_PREFIX . "settings WHERe meta_key='downloads_location' LIMIT 1;" );
+    if( mysqli_num_rows( $fetchDownloadDir ) == 0 ) {
+        $insertDlDir = mysqli_query( $con, "INSERT INTO " . TSA_DB_PREFIX . "settings( meta_key, meta_value ) VALUES( 'downloads_location', '' );" );
+        if( !$insertDlDir ) {
+            ?>
+            <div class="alert alert-danger"><?php echo mysqli_error( $con ); ?></div>
+            <?php
+        }
+        $downloadsDir = '';
+    } else {
+        $fetchDlDirArray = mysqli_fetch_array( $fetchDownloadDir );
+        $downloadsDir = $fetchDlDirArray['meta_value'];
+    }
 
     if( !empty( $_POST['add_filetype'] ) ) {
         $add_filetype = $_POST['add_filetype'];
@@ -44,6 +57,20 @@
             <?php
         }
     }
+
+    if( !empty( $_POST['downloads_dir'] ) ) {
+        $downloads_dir = mysqli_real_escape_string( $con, $downloads_dir );
+        $updateDlDir = mysqli_query( $con, "UPDATE " . TSA_DB_PREFIX . "settings SET meta_value='" . $downloads_dir . "' WHERE meta_key='downloads_location';" );
+        if( $updateDlDir ) {
+            ?>
+            <div class="alert alert-success">Downloads location successfully updated.</div>
+            <?php
+        } else {
+            ?>
+            <div class="alert alert-danger"><?php echo mysqli_error( $con ); ?></div>
+            <?php
+        }
+    }
 ?>
 <div class="panel panel-success">
     <div class="panel-heading">Add whitelisted filetype</div>
@@ -52,13 +79,13 @@
             <div class="form-group">
                 <label for="add_filetype">File extension:</label>
                 <input type="text" name="add_filetype" id="add_filetype" class="form-control" required="" />
-                <p class="help-text">Do not include the period in front of the file extension.</p>
+                <span class="help-block">Do not include the period in front of the file extension.</span>
             </div>
 
             <div class="form-group">
                 <label for="add_mimetype">MIME type:</label>
                 <input type="text" name="add_mimetype" id="add_mimetype" class="form-control" placeholder="Optional" />
-                <p class="help-text">This is an optional parameter that allows you to specify a specific <a href="https://en.wikipedia.org/wiki/MIME" target="_blank">MIME type</a> for certain filetypes.</p>
+                <span class="help-block">This is an optional parameter that allows you to specify a specific <a href="https://en.wikipedia.org/wiki/MIME" target="_blank">MIME type</a> for certain filetypes.</span>
             </div>
 
             <button type="submit" class="btn btn-success">Add filetype</button>
@@ -77,13 +104,28 @@
                     <?php
                         foreach( $filetypes as $ext => $mime ) {
                             ?>
-                            <option value="<?php echo $ext; ?>"><?php echo $mime; ?></option>
+                            <option value="<?php echo $ext; ?>"><?php echo $ext; ?> - <?php echo $mime; ?></option>
                             <?php
                         }
                     ?>
                 </select>
             </div>
             <button type="submit" class="btn btn-danger" onclick='confirm( "Are you sure you want to remove this filetyper?" );' )>Remove filetype</button>
+        </form>
+    </div>
+</div>
+
+<div class="panel panel-warning">
+    <div class="panel-heading">Set new downloads directory</div>
+    <div class="panel-body">
+        <form method="post" action="admin.php?page=downloads">
+            <div class="form-group">
+                <label for="downloads_dir">Downloads directory</label>
+                <input type="text" value="<?php echo $downloadsDir; ?>" required="" name="downloads_dir" id="downloads_dir" />
+                <span class="help-block">This will not move old download files to the new location, so please do this manually.</span>
+            </div>
+
+            <button type="submit" class="btn btn-warning">Set new downloads directory</button>
         </form>
     </div>
 </div>

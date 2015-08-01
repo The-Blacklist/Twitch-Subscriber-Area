@@ -90,15 +90,16 @@
 
                     if( $isSubbed || $isWhitelisted || $isMod ) {
                         $dlInfo = mysqli_fetch_array( $fetchDownload );
-                        $fileLocation = basename( $downloadsDir . DIRECTORY_SEPARATOR . $dlInfo['hash'] . $dlInfo['filetype'] );
+                        $fileLocation = $downloadsDir . DIRECTORY_SEPARATOR . $dlInfo['hash'] . "." . $dlInfo['filetype'];
                         if( file_exists( $fileLocation ) && isset( $filetypes[ $dlInfo[ 'filetype' ] ] ) ) {
                             header( 'Content-Description: File Transfer');
                             header( 'Content-Type: ' . $filetypes[ $dlInfo[ 'filetype' ] ] );
-                            header( 'Content-Disposition: attachment; filename=' . $dlInfo['original_file_name'] );
+                            header( 'Content-Disposition: inline; filename=' . $dlInfo['original_file_name'] );
                             header( 'Expires: 0' );
                             header( 'Cache-Control: must-revalidate' );
                             header( 'Pragma: public' );
                             header( 'Content-Length: ' . $dlInfo['size'] );
+                            flush();
                             readfile( $fileLocation );
                             exit();
                         } else {

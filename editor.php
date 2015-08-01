@@ -23,7 +23,7 @@
 
     // For <v1.2 support
     $checkDownloads = mysqli_query( $con, "SHOW TABLES LIKE '" . TSA_DB_PREFIX . "downloads';" );
-    if( mysqli_num_rows( checkDownloads ) == 0 ) {
+    if( mysqli_num_rows( $checkDownloads ) == 0 ) {
         $createDownload = mysqli_query( $con, "CREATE TABLE " . TSA_DB_PREFIX . "downloads( id int NOT NULL AUTO_INCREMENT, PRIMARY KEY(id), post_id int(11), hash char(40), filetype varchar(255), original_file_name varchar(255), size int(11), date date );" );
         if( !$createDownload ) {
             ?>
@@ -53,7 +53,7 @@
             'ogg' => 'audio/ogg',
             'm4v' => 'video/mp4',
             'mp4' => 'video/mp4',
-            'webm' => 'video/webm';
+            'webm' => 'video/webm'
         );
         $createDLWhitelist = mysqli_query( $con, "INSERT INTO " . TSA_DB_PREFIX . "settings( meta_key, meta_value ) VALUES( 'downloads_whitelist', '" . json_encode( $dlFileTypes ) . "' );");
     }
@@ -77,7 +77,7 @@
                         require 'includes/editor/edit.php';
                     } elseif( isset( $_GET['delete'] ) ) {
                         require 'includes/editor/delete.php';
-                    } elseif( isset( $_GET['downloads'] ) {
+                    } elseif( isset( $_GET['downloads'] ) ) {
                         require 'includes/editor/downloads.php';
                     } else {
                         $allPosts = mysqli_query( $con, "SELECT id, title, body FROM " . TSA_DB_PREFIX . "posts;" );
@@ -104,7 +104,8 @@
                             <?php
                         }
                         ?>
-                        <a href="<?php echo TSA_REDIRECTURL; ?>/editor.php?add" class="btn btn-success">Add post</a><br />
+                        <a href="<?php echo TSA_REDIRECTURL; ?>/editor.php?add" class="btn btn-success">Add post</a><br /><br />
+                        <a href="<?php echo TSA_REDIRECTURL; ?>/editor.php?downloads" class="btn btn-warning">Manage downloads</a><br />
                         <?php
                     }
                     mysqli_close( $con );

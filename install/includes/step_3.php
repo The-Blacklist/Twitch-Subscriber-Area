@@ -7,11 +7,11 @@
         $db_name = $_POST['db_name'];
         $twitch_api_key = $_POST['twitch_apikey'];
         $twitch_secret = $_POST['twitch_secret'];
-        $downloads_location = ( strpos( $_POST['downloads_location'], '/' ) === 0 ? basename( $_POST['downloads_location'] ) : basename( '../' . $_POST['downloads_location'] ) );
+        $downloads_location = $_POST['downloads_location'];
         $twitch_redirect = ( !isset( $_POST['twitch_redirect'] ) || $_POST['twitch_redirect'] == '' ? $_SESSION['TSAURL'] : $_POST['twitch_redirect'] );
         $db_tblprefix = ( !isset( $_POST['db_tableprefix'] ) || str_replace( ' ', '', $_POST['db_tableprefix'] ) == '' ? 'tsa_' : str_replace( ' ', '', preg_replace( '([^A-Z,^0-9,^a-z,^_])', '', $_POST['db_tableprefix'] ) ) ); // Should work for making sure that table prefixes are MySQL-valid.
         $missing = false;
-        $configFile = implode( DIRECTORY_SEPARATOR, array( '..', 'includes', 'config.php' ) );
+        $configFile = implode( DIRECTORY_SEPARATOR, array( 'includes', 'config.php' ) );
 
         if( empty( $db_user ) || empty( $db_pass ) || empty( $db_name ) || empty( $twitch_api_key ) || empty( $twitch_secret ) || empty( $downloads_location ) ) { $missing = true; }
         if( empty( $db_user ) ) { echo '<div class="alert alert-danger">Missing MySQL username</div>'; }
@@ -37,6 +37,7 @@
                     'TSA_APISECRET' => $twitch_secret,
                     'TSA_REDIRECTURL' => $twitch_redirect
                 );
+                chdir( '..' ); // Go up one directory for writing files.
                 if( is_writeable( $configFile ) ) {
                     $config = "<?php \n";
                     $config .= "    // MySQL database information\n";
@@ -68,11 +69,11 @@
                         }
                     }
 
-                    $writeDlIndex = fopen( basename( $downloads_location . DIRECTORY_SEPARATOR . '.htaccess' ), 'w' ) or die( 'Unable to write file inside ' . $downloads_location . '. Please make sure the web server user has the correct permissions.' );
+                    $writeDlIndex = fopen( $downloads_location . DIRECTORY_SEPARATOR . 'index.php', 'w' ) or die( 'Unable to write file inside ' . $downloads_location . '. Please make sure the web server user has the correct permissions.' );
                     fwrite( $writeDlIndex, "<?php // Nothing to see here ?>" );
                     fclose( $writeDlIndex );
 
-                    $writeDlHtaccess = fopen( basename( $downloads_location . DIRECTORY_SEPARATOR . '.htaccess' ), 'w' ) or die( 'Unable to write file inside ' . $downloads_location . '. Please make sure the web server user has the correct permissions.' );
+                    $writeDlHtaccess = fopen( $downloads_location . DIRECTORY_SEPARATOR . '.htaccess', 'w' ) or die( 'Unable to write file inside ' . $downloads_location . '. Please make sure the web server user has the correct permissions.' );
                     fwrite( $writeDlHtaccess, "Deny from all" );
                     fclose( $writeDlHtaccess );
 
@@ -111,7 +112,7 @@
                                             'mp4' => 'video/mp4',
                                             'webm' => 'video/webm'
                                         );
-                                        $downloads_location = mysqli_real_escape_string( $con, basename( $downloads_location . DIRECTORY_SEPARATOR ) );
+                                        $downloads_location = mysqli_real_escape_string( $con, $downloads_location );
                                         $insertDlFiletypes = "INSERT INTO " . $db_tblprefix . "settings( meta_key, meta_value ) VALUES( 'downloads_whitelist', '" . json_encode( $dlFileTypes ) . "' );";
                                         $insertDlPlaceholder = "INSERT INTO " . $db_tblprefix . "settings( meta_key, meta_value ) VALUES( 'downloads_location', '" . $downloads_location . "' );";
                                         $result = mysqli_multi_query( $con, $insertDlFiletypes . $insertDlPlaceholder );
