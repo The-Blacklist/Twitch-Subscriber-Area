@@ -203,7 +203,6 @@
                                                     <?php
                                                         if( mysqli_num_rows( $fetchPostDLs ) > 0 ) {
                                                             ?>
-                                                            <div class="panel panel-footer">Attached downloads:</div>
                                                             <table class="table">
                                                                 <thead>
                                                                     <tr>

@@ -58,17 +58,39 @@
         }
     }
 
+
+    $dlDirSuccess = false;
     if( !empty( $_POST['downloads_dir'] ) ) {
         $downloads_dir = mysqli_real_escape_string( $con, $downloads_dir );
         $updateDlDir = mysqli_query( $con, "UPDATE " . TSA_DB_PREFIX . "settings SET meta_value='" . $downloads_dir . "' WHERE meta_key='downloads_location';" );
-        if( $updateDlDir ) {
+        if( file_exists( $downloads_dir ) ) {
+            if( is_dir( $downloads_dir ) ) {
+                if( !is_writeable( $downloads_dir ) ) {
+                    echo '<div class="alert alert-danger">' . $downloads_dir . ' is not writable.</div>';
+                } else {
+                    $dlDirSuccess = true;
+                }
+            } else {
+                echo '<div class="alert alert-danger">' . $downloads_dir . ' is not a folder.</div>';
+            }
+        } else {
+            if( !mkdir( $downloads_dir, 0777, true ) ) {
+                echo '<div class="alert alert-danger">Unable to create folder for downloadable files at: ' . $downloads_dir . '</div>';
+            } else {
+                $dlDirSuccess = true;
+            }
+        }
+
+        if( $dlDirSuccess && $updateDlDir ) {
             ?>
             <div class="alert alert-success">Downloads location successfully updated.</div>
             <?php
         } else {
-            ?>
-            <div class="alert alert-danger"><?php echo mysqli_error( $con ); ?></div>
-            <?php
+            if( mysqli_error( $con ) ) {
+                ?>
+                <div class="alert alert-danger"><?php echo mysqli_error( $con ); ?></div>
+                <?php
+            }
         }
     }
 ?>
@@ -121,7 +143,7 @@
         <form method="post" action="admin.php?page=downloads">
             <div class="form-group">
                 <label for="downloads_dir">Downloads directory</label>
-                <input type="text" value="<?php echo $downloadsDir; ?>" required="" name="downloads_dir" id="downloads_dir" />
+                <input type="text" value="<?php echo $downloadsDir; ?>" class="form-control" required="" name="downloads_dir" id="downloads_dir" />
                 <span class="help-block">This will not move old download files to the new location, so please do this manually.</span>
             </div>
 

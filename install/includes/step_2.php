@@ -35,7 +35,7 @@
     <div class="form-group">
         <label for="downloads_location">Folder location to place downloadable files for subscribers:</label>
         <input type="text" class="form-control" name="downloads_location" id="downloads_location" placeholder="totally_hidden_files/" />
-        <p class="help-block">Please make sure this location is writable. If the folder doesn't exist, TSA will attempt to create it. It is recommended to keep this folder away from the web directory or difficult to find.</p>
+        <span class="help-block">Please make sure this location is writable. If the folder doesn't exist, TSA will attempt to create it. It is recommended to keep this folder away from the web directory or difficult to find.</span>
     </div>
     <button class="btn btn-success">Continue to step #3</button>
 </form>

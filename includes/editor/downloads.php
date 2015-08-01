@@ -4,9 +4,9 @@
     $fetchUploadDirectory = mysqli_fetch_array( mysqli_query( $con, "SELECT meta_value FROM " . TSA_DB_PREFIX . "settings WHERE meta_key='downloads_location' LIMIT 1;" ) );
     $uploadDirectory = $fetchUploadDirectory['meta_value'];
     $fetchDownloads = mysqli_query( $con, "SELECT id, post_id, hash, filetype, original_file_name, size FROM " . TSA_DB_PREFIX . "downloads;" );
+    $filetypesArray = mysqli_fetch_array( $fetchFiletypes );
+    $wlFiletypes = json_decode( $filetypesArray['meta_value'], true );
     if( !empty( $_POST['post_id'] ) && !empty( $_FILES['file_upload'] ) && !empty( $uploadDirectory ) ) {
-        $filetypesArray = mysqli_fetch_array( $fetchFiletypes );
-        $wlFiletypes = json_decode( $filetypesArray['meta_value'], true );
         $fileInfo = $_FILES['file_upload'];
         $originalFileName = $fileInfo['name'];
         $filesize = $fileInfo['size'];
@@ -108,6 +108,7 @@
             <div class="form-group">
                 <label for="file_upload">File to upload:</label>
                 <input type="file" name="file_upload" id="file_upload" class="form-control" required="" />
+                <span class="help-block"><strong>Allowed filetypes: </strong><?php echo implode( ', ', array_keys( $wlFiletypes ) ); ?></span>
             </div>
 
             <button type="submit" class="btn btn-success">Add file</button>
