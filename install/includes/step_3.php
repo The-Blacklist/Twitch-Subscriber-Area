@@ -1,12 +1,13 @@
 <h2>Installation - Step #3</h2>
 <?php
     if( isset( $_POST['db_username'] ) && isset( $_POST['db_password'] ) && isset( $_POST['db_name'] ) && isset( $_POST['twitch_apikey'] ) && isset( $_POST['twitch_secret'] ) && isset( $_POST['downloads_location'] ) ) {
-        $db_host = ( !isset( $_POST['db_host'] ) || $_POST['db_host'] == '' ? 'localhost' : $_POST['db_host'] );
-        $db_host_values = explode( ':', $db_host );
+        $pre_db_host = ( !isset( $_POST['db_host'] ) || $_POST['db_host'] == '' ? 'localhost' : $_POST['db_host'] );
+        $db_host_values = explode( ':', $pre_db_host );
         if( intval( $db_host_values[ 1 ] ) ) {
             $db_host = $db_host_values[ 0 ];
             $db_port = intval( $db_host_values[ 1 ] );
         } else {
+            $db_host = $pre_db_host;
             $db_port = ini_get( "mysqli.default_port" );
         }
         $db_user = $_POST['db_username'];
@@ -33,7 +34,7 @@
                 echo '<div class="alert alert-danger">MySQL Error! <strong>' . mysqli_error( $con ) . '</strong></div>';
             } else {
                 $dbConstants = array(
-                    'TSA_DB_HOST' => $db_host,
+                    'TSA_DB_HOST' => $pre_db_host,
                     'TSA_DB_USER' => $db_user,
                     'TSA_DB_PASS' => $db_pass,
                     'TSA_DB_NAME' => $db_name,

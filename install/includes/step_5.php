@@ -16,7 +16,7 @@
                     $db_host = TSA_DB_HOST;
                     $db_port = ini_get( "mysqli.default_port" );
                 }
-                $con = mysqli_connect( $db_host, TSA_DB_USER, TSA_DB_PASS, TSA_DB_NAME ) or die( 'Error connecting to database.' );
+                $con = mysqli_connect( $db_host, TSA_DB_USER, TSA_DB_PASS, TSA_DB_NAME, $db_port ) or die( 'Error connecting to database.' );
                 $adminUserInfo = array( $userID => array( 'name' => $_POST[ 'admin_username' ] ) );
                 $admin = json_encode( $adminUserInfo ); // As there is no way to lookup user IDs in the Twitch API (for now), this will have to do.
                 $query = "INSERT INTO " . TSA_DB_PREFIX . "settings( meta_key, meta_value ) VALUES( 'admins', '$admin' );"; // Setup admin array
