@@ -23,22 +23,28 @@
             <div class="alert alert-danger">This post is invalid or does not exist.</div>
             <?php
         } else {
-            $origName = mysqli_real_escape_string( $con, $originalFileName );
-            $insertDl = mysqli_query( $con, "INSERT INTO " . TSA_DB_PREFIX . "downloads( post_id, hash, filetype, original_file_name, size, date ) VALUES( '" . $post_id . "', '" . $fileHash . "', '" . $fileType . "', '" . $origName . "', '" . $filesize . "', '" . date( "Y-m-d H:i:s" ) . "' );" );
-            if( move_uploaded_file( $fileInfo['tmp_name'], $uploadDirectory . DIRECTORY_SEPARATOR . $fileHash . "." . $fileType ) && $insertDl ) {
+            if( returnBytes( ini_get( "upload_max_filesize" ) ) < $filesize || returnBytes( ini_get( "post_max_size" ) ) < $filesize ) {
                 ?>
-                <div class="alert alert-success">Download has been successfully added.</div>
+                <div class="alert alert-warning">File is too big in filesize to be uploaded.</div>
                 <?php
             } else {
-                $checkError = mysqli_error( $con );
-                if( $checkError ) {
+                $origName = mysqli_real_escape_string( $con, $originalFileName );
+                $insertDl = mysqli_query( $con, "INSERT INTO " . TSA_DB_PREFIX . "downloads( post_id, hash, filetype, original_file_name, size, date ) VALUES( '" . $post_id . "', '" . $fileHash . "', '" . $fileType . "', '" . $origName . "', '" . $filesize . "', '" . date( "Y-m-d H:i:s" ) . "' );" );
+                if( move_uploaded_file( $fileInfo['tmp_name'], $uploadDirectory . DIRECTORY_SEPARATOR . $fileHash . "." . $fileType ) && $insertDl ) {
                     ?>
-                    <div class="alert alert-danger">MySQL Error! <?php echo $checkError; ?></div>
+                    <div class="alert alert-success">Download has been successfully added.</div>
                     <?php
                 } else {
-                    ?>
-                    <div class="alert alert-danger">Error moving uploaded file to downloads directory!</div>
-                    <?php
+                    $checkError = mysqli_error( $con );
+                    if( $checkError ) {
+                        ?>
+                        <div class="alert alert-danger">MySQL Error! <?php echo $checkError; ?></div>
+                        <?php
+                    } else {
+                        ?>
+                        <div class="alert alert-danger">Error moving uploaded file to downloads directory!</div>
+                        <?php
+                    }
                 }
             }
         }
