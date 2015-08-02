@@ -22,15 +22,12 @@
     }
 
     // For <v1.2 support
-    $checkDownloads = mysqli_query( $con, "SHOW TABLES LIKE '" . TSA_DB_PREFIX . "downloads';" );
-    if( mysqli_num_rows( $checkDownloads ) == 0 ) {
-        $createDownload = mysqli_query( $con, "CREATE TABLE " . TSA_DB_PREFIX . "downloads( id int NOT NULL AUTO_INCREMENT, PRIMARY KEY(id), post_id int(11), hash char(40), filetype varchar(255), original_file_name varchar(255), size int(11), date date );" );
-        if( !$createDownload ) {
-            ?>
-            <div class="alert alert-danger">Unable to create <?php echo TSA_DB_PREFIX; ?>downloads in the database!</div>
-            <?php
-            exit();
-        }
+    $createDownload = mysqli_query( $con, "CREATE TABLE IF NOT EXISTS " . TSA_DB_PREFIX . "downloads( id int NOT NULL AUTO_INCREMENT, PRIMARY KEY(id), post_id int(11), hash char(40), filetype varchar(255), original_file_name varchar(255), size int(11), date date );" );
+    if( !$createDownload ) {
+        ?>
+        <div class="alert alert-danger">Unable to create <?php echo TSA_DB_PREFIX; ?>downloads in the database!</div>
+        <?php
+        exit();
     }
 
     $checkDLWhitelist = mysqli_query( $con, "SELECT meta_value FROM " . TSA_DB_PREFIX . "settings WHERE meta_key='downloads_whitelist' LIMIT 1;" );
