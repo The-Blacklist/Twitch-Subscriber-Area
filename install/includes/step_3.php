@@ -2,6 +2,12 @@
 <?php
     if( isset( $_POST['db_username'] ) && isset( $_POST['db_password'] ) && isset( $_POST['db_name'] ) && isset( $_POST['twitch_apikey'] ) && isset( $_POST['twitch_secret'] ) && isset( $_POST['downloads_location'] ) ) {
         $db_host = ( !isset( $_POST['db_host'] ) || $_POST['db_host'] == '' ? 'localhost' : $_POST['db_host'] );
+        $db_host_values = explode( ':', $db_host );
+        if( intval( $db_host_values[ 1 ] ) ) {
+            $db_port = intval( $db_host_values[ 1 ] );
+        } else {
+            $db_port = ini_get( "mysqli.default_port" );
+        }
         $db_user = $_POST['db_username'];
         $db_pass = $_POST['db_password'];
         $db_name = $_POST['db_name'];
@@ -21,7 +27,7 @@
         if( empty( $twitch_secret ) ) { echo '<div class="alert alert-danger">Missing Twitch API secret</div>'; }
         if( empty( $downloads_location ) ) { echo '<div class="alert alert-danger">Missing folder location of subscriber downloads</div>'; }
         if( $missing ) { echo '<a href="install.php?step=2" class="btn btn-warning">Back to step #2</a>'; } else {
-            $con = mysqli_connect( $db_host, $db_user, $db_pass, $db_name ) or die( 'Error connecting to database.' );
+            $con = mysqli_connect( $db_host, $db_user, $db_pass, $db_name, $db_port ) or die( 'Error connecting to database.' );
             if( !$con ) {
                 echo '<div class="alert alert-danger">MySQL Error! <strong>' . mysqli_error( $con ) . '</strong></div>';
             } else {

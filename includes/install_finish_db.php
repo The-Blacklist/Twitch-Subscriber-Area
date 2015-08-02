@@ -1,5 +1,11 @@
 <?php
-    $con = mysqli_connect( TSA_DB_HOST, TSA_DB_USER, TSA_DB_PASS, TSA_DB_NAME );
+    $db_host_values = explode( ':', TSA_DB_HOST );
+    if( intval( $db_host_values[ 1 ] ) ) {
+        $db_port = intval( $db_host_values[ 1 ] );
+    } else {
+        $db_port = ini_get( "mysqli.default_port" );
+    }
+    $con = mysqli_connect( TSA_DB_HOST, TSA_DB_USER, TSA_DB_PASS, TSA_DB_NAME, $db_port );
     if( !$con ) {
         echo 'MySQL error - TSA cannot initialize: ' . mysqli_error( $con );
         exit();
