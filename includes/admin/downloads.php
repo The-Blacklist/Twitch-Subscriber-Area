@@ -61,7 +61,7 @@
 
     $dlDirSuccess = false;
     if( !empty( $_POST['downloads_dir'] ) ) {
-        $downloads_dir = mysqli_real_escape_string( $con, $downloads_dir );
+        $downloads_dir = mysqli_real_escape_string( $con, $_POST['downloads_dir'] );
         $updateDlDir = mysqli_query( $con, "UPDATE " . TSA_DB_PREFIX . "settings SET meta_value='" . $downloads_dir . "' WHERE meta_key='downloads_location';" );
         if( file_exists( $downloads_dir ) ) {
             if( is_dir( $downloads_dir ) ) {
