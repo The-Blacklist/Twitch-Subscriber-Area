@@ -7,7 +7,6 @@
             $db_host = $db_host_values[ 0 ];
             $db_port = intval( $db_host_values[ 1 ] );
         } else {
-            $db_host = TSA_DB_HOST;
             $db_port = ini_get( "mysqli.default_port" );
         }
         $db_user = $_POST['db_username'];
