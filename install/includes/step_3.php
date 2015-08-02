@@ -98,8 +98,10 @@
                                 echo '<div class="alert alert-success">Created "' . $db_tblprefix . 'whitelist" table.</div>';
                                 $result = mysqli_query( $con, "CREATE TABLE " . $db_tblprefix . "blacklist( id int NOT NULL AUTO_INCREMENT, PRIMARY KEY(id), name varchar(25), uid int UNIQUE, reason mediumtext );" );
                                 if( $result ) {
+                                    echo '<div class="alert alert-success">Created "' . $db_tblprefix . 'blacklist" table.</div>';
                                     $result = mysqli_query( $con, "CREATE TABLE " . $db_tblprefix . "downloads( id int NOT NULL AUTO_INCREMENT, PRIMARY KEY(id), post_id int(11), hash char(40), filetype varchar(255), original_file_name varchar(255), size int(11), date date );" );
                                     if( $result ) {
+                                        echo '<div class="alert alert-success">Created "' . $db_tblprefix . 'downloads" table.</div>';
                                         $dlFileTypes = array(
                                             'png' => 'image/png',
                                             'jpeg' => 'image/jpeg',
