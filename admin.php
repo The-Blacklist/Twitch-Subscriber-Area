@@ -24,6 +24,7 @@
             'png' => 'image/png',
             'jpeg' => 'image/jpeg',
             'jpg' => 'image/jpeg',
+            'gif' => 'image/gif',
             'bmp' => 'image/bmp',
             'pdf' => 'application/pdf',
             'zip' => 'application/octet-stream',
