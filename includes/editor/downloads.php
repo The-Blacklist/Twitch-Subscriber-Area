@@ -11,7 +11,8 @@
         $originalFileName = $fileInfo['name'];
         $filesize = $fileInfo['size'];
         $fileHash = sha1( sprintf( "%s_%s", time(), $originalFileName ) );
-        $fileType = pathinfo( $originalFileName )['extension'];
+        $filePathinfo = pathinfo( $originalFileName );
+        $fileType = $filePathinfo['extension'];
         $post_id = intval( $_POST['post_id'] );
         if( !isset( $wlFiletypes[ $fileType ] ) ) {
             ?>

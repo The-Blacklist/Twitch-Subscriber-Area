@@ -3,7 +3,7 @@
     if( isset( $_POST['db_username'] ) && isset( $_POST['db_password'] ) && isset( $_POST['db_name'] ) && isset( $_POST['twitch_apikey'] ) && isset( $_POST['twitch_secret'] ) && isset( $_POST['downloads_location'] ) ) {
         $pre_db_host = ( !isset( $_POST['db_host'] ) || $_POST['db_host'] == '' ? 'localhost' : $_POST['db_host'] );
         $db_host_values = explode( ':', $pre_db_host );
-        if( intval( $db_host_values[ 1 ] ) ) {
+        if( isset( $db_host_values[ 1 ] ) && intval( $db_host_values[ 1 ] ) ) {
             $db_host = $db_host_values[ 0 ];
             $db_port = intval( $db_host_values[ 1 ] );
         } else {

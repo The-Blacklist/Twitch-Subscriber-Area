@@ -85,6 +85,7 @@
             ?>
             <div class="alert alert-success">Downloads location successfully updated.</div>
             <?php
+            $downloadsDir = $downloads_dir;
         } else {
             if( mysqli_error( $con ) ) {
                 ?>
@@ -93,6 +94,8 @@
             }
         }
     }
+    $fetchFiletypes = mysqli_fetch_array( mysqli_query( $con, "SELECT meta_value FROM " . TSA_DB_PREFIX . "settings WHERE meta_key='downloads_whitelist' LIMIT 1;" ) );
+    $filetypes = json_decode( $fetchFiletypes['meta_value'], true );
 ?>
 <div class="panel panel-success">
     <div class="panel-heading">Add whitelisted filetype</div>

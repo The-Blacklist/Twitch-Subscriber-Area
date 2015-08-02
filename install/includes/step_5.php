@@ -9,7 +9,7 @@
             $userID = $twitch->getUserID( $_POST['admin_username'] );
             if( $userID ) {
                 $db_host_values = explode( ':', TSA_DB_HOST );
-                if( intval( $db_host_values[ 1 ] ) ) {
+                if( isset( $db_host_values[ 1 ] ) && intval( $db_host_values[ 1 ] ) ) {
                     $db_host = $db_host_values[ 0 ];
                     $db_port = intval( $db_host_values[ 1 ] );
                 } else {
