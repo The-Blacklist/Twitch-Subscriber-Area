@@ -112,8 +112,10 @@
                     header( 'Location: ' . TSA_REDIRECTURL . '?dl_error=no_streams' );
                 }
             }
+        } else {
+            header( 'Location: ' . TSA_REDIRECTURL . '?dl_error=invalid_id' );
         }
     } else {
-        header( 'Location: ' . TSA_REDIRECTURL . '?dl_error=invalid_id' );
+        header( 'Location: ' . TSA_REDIRECTURL . '?dl_error=empty_id' );
     }
 ?>

@@ -118,7 +118,9 @@
                                 "not_found" => "This file was not found.",
                                 "no_sub" => "You are not a subscriber and will not get access.",
                                 "no_streams" => "There are no subscriber streams to verify subscriber status for.",
-                                "invalid_id" => "Invalid download ID."
+                                "invalid_id" => "Invalid download ID.",
+                                "no_exist" => "This download does not exist.",
+                                "empty_id" => "Download ID needs to be specified."
                             );
 
                             if( !empty( $_GET['dl_error'] ) ) {
