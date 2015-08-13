@@ -78,13 +78,16 @@
             } else {
                 $fetchSubStreams = mysqli_fetch_array( mysqli_query( $con, "SELECT meta_value FROM " . TSA_DB_PREFIX . "settings WHERE meta_key='subscriber_streams';" ) );
                 $getSubStreams = json_decode( $fetchSubStreams['meta_value'], true );
+                $Twitch = new Decicus\Twitch( TSA_APIKEY, TSA_APISECRET, TSA_REDIRECTURL );
                 if( !empty( $getSubStreams ) || $isMod || $isWhitelisted ) {
                     $isSubbed = false;
-                    foreach( $getSubStreams as $UID => $info ) {
-                        $name = $info['name'];
-                        if( $Twitch->isSubscribed( $at, $username, $name ) == 100 ) {
-                            $isSubbed = true;
-                            break;
+                    if( !$isMod || !$isWhitelisted ) {
+                        foreach( $getSubStreams as $UID => $info ) {
+                            $name = $info['name'];
+                            if( $Twitch->isSubscribed( $at, $username, $name ) == 100 ) {
+                                $isSubbed = true;
+                                break;
+                            }
                         }
                     }
 
