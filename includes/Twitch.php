@@ -21,6 +21,7 @@ class Twitch {
     // Generic get() method for communication with the kraken API.
     function get( $url = '', $header = array() ) {
         $header[] = 'Client-ID: ' . $this->API_KEY;
+        $header[] = 'Accept: application/vnd.twitchtv.v3+json';
         $curl = curl_init();
         curl_setopt( $curl, CURLOPT_URL, $this::API_URL . $url );
         curl_setopt( $curl, CURLOPT_RETURNTRANSFER, 1 );
