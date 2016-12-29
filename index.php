@@ -162,10 +162,11 @@
                                     $atError = NULL;
                                     foreach( $getSubStreams as $UID => $info ) {
                                         $name = $info[ 'name' ];
-                                        if( $Twitch->isSubscribed( $at, $username, $name ) == 100 ) {
+                                        $isSub = $Twitch->isSubscribed( $at, $username, $name );
+                                        if( $isSub === 100 ) {
                                             $isSubbed = true;
                                             break;
-                                        } elseif( $Twitch->isSubscribed( $at, $username, $name ) == 401 ) {
+                                        } elseif( $isSub === 401 ) {
                                             $atError = '<div class="alert alert-danger">There was an error retrieving subscriber status, please <a href="' . TSA_REDIRECTURL . '/?logout" class="alert-link">logout</a> and connect with Twitch again.</div>';
                                         }
                                     }
@@ -258,7 +259,7 @@
                                                 foreach( $getSubStreams as $UID => $info ) {
                                                     $name = $info[ 'name' ];
                                                     ?>
-                                                    <a href="http://www.twitch.tv/<?php echo $name; ?>" class="list-group-item list-group-item-success">Subscribe to <?php echo $Twitch->getDisplayNameNoAT( $name ); ?></a>
+                                                    <a href="https://www.twitch.tv/<?php echo $name; ?>" class="list-group-item list-group-item-success">Subscribe to <?php echo $Twitch->getDisplayNameNoAT( $name ); ?></a>
                                                     <?php
                                                 }
                                                 ?>

@@ -21,6 +21,7 @@ class Twitch {
     // Generic get() method for communication with the kraken API.
     function get( $url = '', $header = array() ) {
         $header[] = 'Client-ID: ' . $this->API_KEY;
+        $header[] = 'Accept: application/vnd.twitchtv.v5+json';
         $curl = curl_init();
         curl_setopt( $curl, CURLOPT_URL, $this::API_URL . $url );
         curl_setopt( $curl, CURLOPT_RETURNTRANSFER, 1 );
@@ -67,8 +68,8 @@ class Twitch {
 
     // Returns user ID, which is a unique numeric ID. This should work, even after name changes arrive.
     function getUserID( $name = '' ) {
-        $data = $this->get( 'users/' . $name );
-        return ( isset( $data['_id'] ) ? $data['_id'] : false );
+        $data = $this->get( 'users?login=' . $name );
+        return ( isset( $data['users'][0]['_id'] ) ? $data['users'][0]['_id'] : false );
     }
 
     // Returns lowercase name
@@ -94,14 +95,27 @@ class Twitch {
 
     // Gets partner status of $name (channel name).
     function isPartner( $name = '' ) {
-        $data = $this->get( 'channels/' . $name );
+        $id = $this->getUserID( $name );
+
+        if ( !$id ) {
+            return NULL;
+        }
+
+        $data = $this->get( 'channels/' . $id );
         return ( isset( $data['error'] ) ? NULL : $data['partner'] );
     }
 
     // 401 = invalid access token/no access, 404 = not subscribed, 100 = subscribed.
     function isSubscribed( $at = '', $name = '', $chan = '' ) {
+        $user = $this->getUserID( $name );
+        $channel = $this->getUserID( $chan );
+
+        if ( !$user || !$channel ) {
+            return 500; // Something went wrong somewhere.
+        }
+
         $header = array( 'Authorization: OAuth ' . $at );
-        $data = $this->get( 'users/' . $name . '/subscriptions/' . $chan, $header );
+        $data = $this->get( 'users/' . $user . '/subscriptions/' . $channel, $header );
         if( isset( $data['created_at'] ) ) {
             return 100;
         } else {
@@ -111,7 +125,14 @@ class Twitch {
 
     // Does not require access token, only the name (usually lowercase) itself. See: getDisplayName().
     function getDisplayNameNoAT( $name = '' ) {
-        $data = $this->get( 'users/' . $name );
+        $data = $this->get( 'users?login=' . $name );
+
+        if ( empty( $data['users'] ) ) {
+            return false;
+        }
+
+        $data = $data['users'][0];
+
         return ( isset( $data['display_name'] ) ? $data['display_name'] : false );
     }
 

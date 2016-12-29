@@ -87,7 +87,7 @@
                     ?>
                 </select>
             </div>
-            <button type="submit" class="btn btn-danger" onclick='confirm( "Are you sure you want to remove this admin?" );' )>Remove admin</button>
+            <button type="submit" class="btn btn-danger" onclick='return confirm( "Are you sure you want to remove this admin?" );' )>Remove admin</button>
         </form>
     </div>
 </div>
