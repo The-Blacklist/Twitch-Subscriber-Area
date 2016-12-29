@@ -95,7 +95,7 @@
                     ?>
                 </select>
             </div>
-            <button type="submit" class="btn btn-danger" onclick='confirm( "Are you sure you want to remove this streamer?" );' )>Remove streamer</button>
+            <button type="submit" class="btn btn-danger" onclick='return confirm( "Are you sure you want to remove this streamer?" );' )>Remove streamer</button>
         </form>
     </div>
 </div>

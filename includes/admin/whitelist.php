@@ -92,7 +92,7 @@
                     ?>
                 </select>
             </div>
-            <button type="submit" class="btn btn-danger" onclick='confirm( "Are you sure you want to remove this user from the whitelist?" );' )>Remove from whitelist</button>
+            <button type="submit" class="btn btn-danger" onclick='return confirm( "Are you sure you want to remove this user from the whitelist?" );' )>Remove from whitelist</button>
         </form>
     </div>
 </div>
