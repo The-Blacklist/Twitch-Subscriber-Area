@@ -5,7 +5,7 @@
         $addStreamName = mysqli_real_escape_string( $con, $_POST['addStream'] );
         $addStreamUID = $Twitch->getUserID( $_POST['addStream'] );
         if( $addStreamUID ) {
-            $streamPartner = $Twitch->isPartner( $_POST['addStream'] );
+            $streamPartner = $Twitch->isAffiliateOrPartner( $_POST['addStream'] );
             if( !isset( $getStreamers[ $addStreamUID ] ) ) {
                 if( $streamPartner ) {
                     $getStreamers[ $addStreamUID ] = array( 'name' => $addStreamName );
@@ -23,16 +23,16 @@
                 } elseif( $streamPartner === NULL ) {
                     // API likes to go down sometimes...
                     ?>
-                    <div class="alert alert-danger">The Twitch API seems to be struggling. Cannot verify if this user is partnered.</div>
+                    <div class="alert alert-danger">The Twitch API seems to be struggling. Cannot verify if this user is partnered/affiliated.</div>
                     <?php
                 } else {
                     ?>
-                    <div class="alert alert-warning">This user is not a partnered streamer. You can only add partnered streamers to this website.</div>
+                    <div class="alert alert-warning">This user is not a partnered/affiliated streamer. You can only add partnered/affiliated streamers to this website.</div>
                     <?php
                 }
             } else {
                 ?>
-                <div class="alert alert-warning">User is already listed as a partnered streamer.</div>
+                <div class="alert alert-warning">User is already listed as a partnered/affiliated streamer.</div>
                 <?php
             }
         } else {
@@ -66,7 +66,7 @@
     }
 ?>
 <div class="panel panel-success">
-    <div class="panel-heading">Add partnered streamer</div>
+    <div class="panel-heading">Add partnered/affiliated streamer</div>
     <div class="panel-body">
         <form method="post" action="admin.php?page=streamers">
             <div class="form-group">
@@ -79,7 +79,7 @@
 </div>
 
 <div class="panel panel-danger">
-    <div class="panel-heading">Remove partnered streamer</div>
+    <div class="panel-heading">Remove partnered/affiliated streamer</div>
     <div class="panel-body">
         <form method="post" action="admin.php?page=streamers">
             <div class="form-group">
@@ -95,7 +95,7 @@
                     ?>
                 </select>
             </div>
-            <button type="submit" class="btn btn-danger" onclick='return confirm( "Are you sure you want to remove this streamer?" );' )>Remove streamer</button>
+            <button type="submit" class="btn btn-danger" onclick='return confirm( "Are you sure you want to remove this streamer?" );'>Remove streamer</button>
         </form>
     </div>
 </div>

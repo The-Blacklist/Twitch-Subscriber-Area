@@ -105,6 +105,31 @@ class Twitch {
         return ( isset( $data['error'] ) ? NULL : $data['partner'] );
     }
 
+    /**
+     * Returns `true` if the specified channel is a partnered or affiliated Twitch channel.
+     * Returns `null` on errors.
+     *
+     * @param string $name Twitch channel name
+     *
+     * @return boolean|null
+     */
+    function isAffiliateOrPartner($name = '')
+    {
+        $id = $this->getUserID($name);
+
+        if (!$id) {
+            return null;
+        }
+
+        $data = $this->get('channels/' . $id);
+        if (isset($data['error']) || !isset($data['broadcaster_type'])) {
+            return null;
+        }
+
+        $type = $data['broadcaster_type'];
+        return $type === 'partner' || $type === 'affiliate';
+    }
+
     // 401 = invalid access token/no access, 404 = not subscribed, 100 = subscribed.
     function isSubscribed( $at = '', $name = '', $chan = '' ) {
         $user = $this->getUserID( $name );
